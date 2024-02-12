@@ -1,5 +1,55 @@
-﻿<h3>Details</h3>
+﻿@page "/details"
+@page "/details/{MetaID:int}"
+
+@inject NavigationManager NavigationManager
+@inject MetasService MetasService
+@rendermode InteractiveServer
+
+<PageTitle>Detalles de la Meta</PageTitle>
+<EditForm Model="meta">
+	<div class="card">
+
+		<div class="card-header bg-primary">
+			<div class="row text-white text-center">
+				<h3>Detalles de la Meta</h3>
+			</div>
+		</div>
+
+		<div class="card-body">
+			<div class="row  text-center">
+					<label class="fw-bold">MetaID:</label>
+					<span>@meta.MetaId</span>
+
+					<label class="fw-bold">Fecha:</label>
+					<span>@meta.Fecha</span>
+
+				<label class="fw-bold">Descripci&oacute;n</label>
+				<span>@meta.Descripcion</span>
+
+				<label class="fw-bold">Monto:</label>
+				<span>@meta.Monto</span>
+			</div>
+		</div>
+
+		<div class="card-footer d-flex justify-content-end">
+			<a href="index" class="btn btn-danger "><i class="fas fa-reply"></i> Retroceder</a>
+		</div>
+	</div>
+</EditForm>
+
 
 @code {
 
+	public Metas meta = new Metas();
+
+	[Parameter]
+	public int MetaID { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (MetaID > 0)
+		{
+			meta = await MetasService.Buscar(MetaID);
+		}
+	}
 }
