@@ -38,9 +38,9 @@ namespace Parcial1_AP1_AaronHernandez.Services
 			return await _contexto.Metas!.AsNoTracking().Where(m => m.MetaId == meta.MetaId).ExecuteDeleteAsync() > 0;
 		}
 
-		public async Task<Metas?> Buscar(Metas meta)
+		public async Task<Metas?> Buscar(int MetaID)
 		{
-			return await _contexto.Metas!.AsNoTracking().FirstOrDefaultAsync(m => m.MetaId == meta.MetaId);
+			return await _contexto.Metas!.AsNoTracking().FirstOrDefaultAsync(m => m.MetaId == MetaID);
 		}
 
 		public async Task<List<Metas>> Listar(Expression<Func<Metas, bool>> criterio)
