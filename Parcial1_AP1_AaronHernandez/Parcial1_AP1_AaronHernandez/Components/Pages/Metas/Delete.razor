@@ -1,5 +1,109 @@
-﻿<h3>delete</h3>
+﻿@page "/delete"
+@page "/delete/{MetaID:int}"
+
+@inject NavigationManager NavigationManager
+@inject MetasService MetasService
+@rendermode InteractiveServer
+
+<PageTitle>Detalles de la Meta</PageTitle>
+<EditForm Model="meta">
+	<div class="card">
+
+		<div class="card-header bg-primary">
+			<div class="row text-white text-center">
+				<h3>Detalles de la Meta</h3>
+			</div>
+		</div>
+
+		<div class="card-body">
+			<div class="row  text-center">
+				<label class="fw-bold">MetaID:</label>
+				<span>@meta.MetaId</span>
+
+				<label class="fw-bold">Fecha:</label>
+				<span>@meta.Fecha</span>
+
+				<label class="fw-bold">Descripci&oacute;n</label>
+				<span>@meta.Descripcion</span>
+
+				<label class="fw-bold">Monto:</label>
+				<span>@meta.Monto</span>
+				<label class="fw-bold">¿Seguro que quieres eliminar esta meta?</label>
+			</div>		
+		</div>
+
+		<div class="card-footer text-center">
+			<button type="button" class="btn btn-success" @onclick="Eliminar"> Si</button>
+			<a href="index" class="btn btn-danger "> No</a>
+		</div>
+	</div>
+</EditForm>
+
+<div class="exito-contenedor-invalido" style="@fracasoContenedorEstilo">
+	<div id="fracaso-mensaje" class="mensaje-contenedor">@mensajeFracaso</div>
+</div>
+<div class="exito-contenedor-valido" style="@exitoContenedorEstilo">
+	<div id="exito-mensaje" class="mensaje-contenedor">@mensajeExito</div>
+</div>
+
 
 @code {
 
+	public Metas meta = new Metas();
+
+	private string mensajeExito = "";
+	private string mensajeFracaso = "";
+	private string exitoContenedorEstilo = "display: none;";
+	private string fracasoContenedorEstilo = "display: none;";
+
+	[Parameter]
+	public int MetaID { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (MetaID > 0)
+		{
+			meta = await MetasService.Buscar(MetaID);
+		}
+	}
+
+	public async Task Eliminar()
+	{
+		var eliminar = await MetasService.Eliminar(this.meta);
+		if (eliminar)
+		{
+			await MostrarMensaje("Eliminado exitoso.", "Valido");
+			NavigationManager.NavigateTo("index");
+		}
+		else
+		{
+			await MostrarMensaje("Eliminado Incorrecto.", "Invalido");
+			NavigationManager.NavigateTo("index");
+		}
+	}
+
+	public async Task MostrarMensaje(string mensaje, string tipoMensaje)
+	{
+		if (tipoMensaje == "Valido")
+		{
+			mensajeExito = mensaje;
+			exitoContenedorEstilo = "display: block;";
+			fracasoContenedorEstilo = "display: none;";
+
+
+			await Task.Delay(4500);
+			exitoContenedorEstilo = "display: none;";
+			StateHasChanged();
+		}
+		else if (tipoMensaje == "Invalido")
+		{
+			mensajeFracaso = mensaje;
+			fracasoContenedorEstilo = "display: block;";
+			exitoContenedorEstilo = "display: none;";
+
+			await Task.Delay(4500);
+			fracasoContenedorEstilo = "display: none;";
+			StateHasChanged();
+		}
+	}
 }
