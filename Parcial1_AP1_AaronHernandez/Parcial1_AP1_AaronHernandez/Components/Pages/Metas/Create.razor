@@ -1,5 +1,82 @@
-﻿<h3>create</h3>
+﻿@page "/create"
+
+@inject NavigationManager NavigationManager
+@inject MetasService MetasService
+@rendermode InteractiveServer
+
+<PageTitle>Registrar Metas</PageTitle>
+<EditForm Model="meta" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+	<div class="card">
+
+		<div class="card-header bg-primary">
+			<div class="row text-white text-center">
+				<h3 >Registrar Metas</h3>
+			</div>
+		</div>
+
+		<div class="card-body">
+			<div class="row">
+				<div class="col-6">
+					<label class="fw-bold">MetaID:</label>
+					<InputNumber class="form-control" @bind-Value="meta.MetaId"></InputNumber>
+					<ValidationMessage For="@(() => meta.MetaId)"/>
+				</div>
+				<div class="col-6">
+					<label class="fw-bold">Fecha:</label>
+					<InputDate class="form-control" @bind-Value="meta.Fecha"></InputDate>
+					<ValidationMessage For="@(() => meta.Fecha)" />
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-0">
+					<label class="fw-bold">Descripci&oacute;n</label>
+					<InputTextArea class="form-control" @bind-Value="meta.Descripcion"></InputTextArea>
+					<ValidationMessage For="@(() => meta.Descripcion)" />
+				</div>
+				<div class="col-0">
+					<label class="fw-bold">Monto:</label>
+					<InputNumber class="form-control" @bind-Value="meta.Monto"></InputNumber>
+					<ValidationMessage For="@(() => meta.Monto)" />
+				</div>
+			</div>
+		</div>
+
+		<div class="card-footer d-flex justify-content-end">
+			<a href="index" class="btn btn-danger "><i class="fas fa-reply"></i> Retroceder</a>
+			<button type="submit" class="btn btn-success"><i class="fas fa-reply"></i> Guardar</button>
+		</div>
+	</div>
+</EditForm>
+
 
 @code {
+
+	public Metas meta = new Metas();
+
+	protected override async Task OnInitializedAsync()
+	{
+		meta.Fecha = DateTime.Now;
+	}
+
+
+	public async Task Guardar()
+	{
+		var guardar = await MetasService.Guardar(this.meta);
+		if (guardar)
+		{
+			//Mensaje guardar
+			NavigationManager.NavigateTo("index");
+		}
+		else
+		{
+			//Mensaje error
+			NavigationManager.NavigateTo("index");
+		}
+	}
+
+
+
 
 }
