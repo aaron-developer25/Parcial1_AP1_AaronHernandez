@@ -1,5 +1,118 @@
-﻿<h3>index</h3>
+﻿@page "/index"
+
+@inject NavigationManager NavigationManager
+@inject MetasService MetasService
+@rendermode InteractiveServer
+
+<PageTitle>Centro de Metas</PageTitle>
+<EditForm Model="ListarMetas">
+	<DataAnnotationsValidator />
+	<div class="card">
+
+		<div class="card-header bg-primary">
+			<div class="row text-white text-center">
+				<h3>Centro de Metas</h3>
+			</div>
+		</div>
+
+		<div class="card-body">
+			
+			<div class="row mb-4">
+				<div class="col-3">
+					<label class="fw-bold">Filtrar por:</label>
+					<select class="form-select" @bind="filtrar">
+						<option value="metaid">MetaID</option>
+						<option value="descripcion">Descripci&oacute;n</option>
+					</select>
+				</div>
+
+				<div class="col-6">
+					<label class="fw-bold">B&uacute;usqueda:</label>
+					<div class="input-group">
+						<InputText class="form-select" @bind-Value="busqueda"></InputText>
+						<button class="btn btn-outline-primary"><i class="fas fa-search" @onclick="Buscar"></i> Buscar</button>
+					</div>					
+				</div>
+
+				<div class="col d-flex justify-content-end align-items-end">
+					<a href="create" class="btn btn-success"><i class="fas fa-plus"></i> Crear</a>
+				</div>
+
+			</div>
+
+			<table class="table table-bordered text-center">
+				<thead class="bg-primary text-white">
+					<tr>
+						<th>MetasID</th>
+						<th>Fecha</th>
+						<th>Descripci&oacute;n</th>
+						<th>Monto</th>
+						<th>Editar</th>
+						<th>Detalle</th>
+						<th>Eliminar</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in ListarMetas)
+					{
+						<tr>
+							<td>@item.MetaId</td>
+							<td>@item.Fecha</td>
+							<td>@item.Descripcion</td>
+							<td>@item.Monto</td>
+							<td>
+								<a href="edit/@item.MetaId">
+									<img style="width: 28px; height: 28px;" src="/recursos/editar.png"/>
+								</a>
+							</td>
+							<td>
+								<a href="details/@item.MetaId">
+									<img style ="width: 28px; height: 28px;" src="/recursos/detalle.png" />
+								</a>
+							</td>
+							<td>
+								<a href="delete/@item.MetaId">
+									<img style="width: 28px; height: 28px;" src="/recursos/eliminar.png" />
+								</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</EditForm>
+
 
 @code {
+
+	private string filtrar = "metaid", busqueda = "";
+
+	public Metas meta = new Metas();
+	public List<Metas> ListarMetas = new List<Metas>();
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		meta.Fecha = DateTime.Now;
+		ListarMetas = await MetasService.Listar(m => true);
+	}
+
+	public async Task Buscar()
+	{
+		if (filtrar == "metaid" && int.TryParse(busqueda, out int aux))
+		{
+			ListarMetas = await MetasService.Listar(m => m.MetaId == aux);
+		}
+		else if (filtrar == "descripcion")
+		{
+			ListarMetas = await MetasService.Listar(m => m.Descripcion == busqueda);
+		}
+		if (busqueda.Trim() == "")
+		{
+			ListarMetas = await MetasService.Listar(m => true);
+		}
+	}
 
 }
