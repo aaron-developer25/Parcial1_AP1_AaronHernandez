@@ -45,15 +45,29 @@
 
 		<div class="card-footer d-flex justify-content-end">
 			<a href="index" class="btn btn-danger "><i class="fas fa-reply"></i> Retroceder</a>
-			<button type="submit" class="btn btn-success"><i class="fas fa-reply"></i> Guardar</button>
+			<button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Guardar</button>
 		</div>
 	</div>
 </EditForm>
 
 
+<div class="exito-contenedor-invalido" style="@fracasoContenedorEstilo">
+	<div id="fracaso-mensaje" class="mensaje-contenedor">@mensajeFracaso</div>
+</div>
+<div class="exito-contenedor-valido" style="@exitoContenedorEstilo">
+	<div id="exito-mensaje" class="mensaje-contenedor">@mensajeExito</div>
+</div>
+
+
 @code {
 
 	public Metas meta = new Metas();
+
+	private string mensajeExito = "";
+	private string mensajeFracaso = "";
+	private string exitoContenedorEstilo = "display: none;";
+	private string fracasoContenedorEstilo = "display: none;";
+
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -66,17 +80,38 @@
 		var guardar = await MetasService.Guardar(this.meta);
 		if (guardar)
 		{
-			//Mensaje guardar
+			await MostrarMensaje("Guardado exitoso.", "Valido");
 			NavigationManager.NavigateTo("index");
 		}
 		else
 		{
-			//Mensaje error
+			await MostrarMensaje("Guardado Incorrecto.", "Invalido");
 			NavigationManager.NavigateTo("index");
 		}
 	}
 
+	public async Task MostrarMensaje(string mensaje, string tipoMensaje)
+	{
+		if (tipoMensaje == "Valido")
+		{
+			mensajeExito = mensaje;
+			exitoContenedorEstilo = "display: block;";
+			fracasoContenedorEstilo = "display: none;";
 
 
+			await Task.Delay(4500);
+			exitoContenedorEstilo = "display: none;";
+			StateHasChanged();
+		}
+		else if (tipoMensaje == "Invalido")
+		{
+			mensajeFracaso = mensaje;
+			fracasoContenedorEstilo = "display: block;";
+			exitoContenedorEstilo = "display: none;";
 
+			await Task.Delay(4500);
+			fracasoContenedorEstilo = "display: none;";
+			StateHasChanged();
+		}
+	}
 }
